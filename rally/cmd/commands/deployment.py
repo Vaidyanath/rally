@@ -240,9 +240,14 @@ class DeploymentCommands(object):
         headers = ["services", "type", "status"]
         table_rows = []
         try:
-            admin = db.deployment_get(deployment)["admin"]
             # TODO(boris-42): make this work for users in future
-            for endpoint_dict in [admin]:
+            """ admin = db.deployment_get(deployment)["admin"]"""
+            # Updating to work with users and admin
+            deployment = db.deployment_get(deployment)
+            users = deployment.get("users", [])
+            admin = deployment.get("admin")
+            endpoints = users + [admin] if admin else users
+            for endpoint_dict in endpoints:
                 clients = osclients.Clients(objects.Endpoint(**endpoint_dict))
                 client = clients.verified_keystone()
                 print("keystone endpoints are valid and following "
